@@ -4,6 +4,7 @@ from sqlalchemy import __version__ as sqlalchemy_version
 from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy.orm import mapperlib
 from sqlalchemy.inspection import inspect
+from sqlalchemy.ext.associationproxy import ColumnAssociationProxyInstance
 import types
 
 from .exceptions import BadQuery, FieldNotFound, BadSpec
