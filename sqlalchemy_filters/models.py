@@ -39,6 +39,9 @@ class Field(object):
         if isinstance(sqlalchemy_field, types.MethodType):
             sqlalchemy_field = sqlalchemy_field()
 
+        if isinstance(sqlalchemy_field, ColumnAssociationProxyInstance):
+            sqlalchemy_field = sqlalchemy_field.remote_attr
+
         return sqlalchemy_field
 
     def _get_valid_field_names(self):
@@ -47,12 +50,18 @@ class Field(object):
         orm_descriptors = inspect_mapper.all_orm_descriptors
 
         column_names = columns.keys()
-        hybrid_names = [
+
+        associations_proxy = [
             key for key, item in orm_descriptors.items()
-            if _is_hybrid_property(item) or _is_hybrid_method(item) or _is_association_proxy(item)
+            if _is_association_proxy(item)
         ]
 
-        return set(column_names) | set(hybrid_names)
+        hybrid_names = [
+            key for key, item in orm_descriptors.items()
+            if _is_hybrid_property(item) or _is_hybrid_method(item)
+        ]
+
+        return set(column_names) | set(hybrid_names) | set(associations_proxy)
 
 
 def _is_hybrid_property(orm_descriptor):
